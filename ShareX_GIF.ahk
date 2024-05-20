@@ -5,6 +5,8 @@ Persistent
 ShareXPath:="C:\Program Files\ShareX\ShareX.exe"
 ; KeyCastOW.exe程序路径
 KeyCastOWPath:="C:\Tools\Other_Tools\keystroke_visualizer_Tools\KeyCastOW\keycastow.exe"
+; SetDpi工具
+SetDPIPath:="C:\Tools\Other_Tools\SetDpi.exe"
 
 ; 监视鼠标，坐标相对于整个屏幕
 CoordMode "Mouse", "Screen"
@@ -32,7 +34,13 @@ GetCMDOutput(command){
 	if not FileExist(ShareXPath)
 	{
 		; 当目标程序不存在，报告错误
-		MsgBox "ShareX执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行路径！"
+		MsgBox "ShareX.exe执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行路径！"
+		ExitApp
+	}
+	if not FileExist(SetDPIPath)
+	{
+		; 当目标程序不存在，报告错误
+		MsgBox "SetDpi.exe执行路径不存在！请编辑ahk文件修改SetDPIPath为目标exe执行路径！"
 		ExitApp
 	}
 	
@@ -42,7 +50,7 @@ GetCMDOutput(command){
 	
 	
 	; 执行 SetDPI.exe get 命令并获取输出
-	output := GetCMDOutput("C:\Tools\Other_Tools\SetDpi.exe get")
+	output := GetCMDOutput(SetDPIPath " get")
 	
 	; 获取字符串中的DPI缩放倍率
 	DPI_ZOOM:=StrReplace(output,"Current Resolution: ","")

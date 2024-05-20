@@ -3,13 +3,19 @@
 
 感谢Brook Hong作者开发。
 
+#### AHK示例 
+
 本软件结合 [ShareX](https://github.com/ShareX/ShareX) 和 [ANK](https://autohotkey.com/) 使用，每次截图能节约一些时间
+
+[示例视频.webm](https://github.com/allrobot/KeyCastOW_chinese/assets/43485379/31a7c584-d820-4d9b-ad31-c4ccae7f52d9)
 
 下载ank安装，ahk文件放置于`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp`运行即可
 
-#### AHK示例 
+##### 所需工具：
 
-[示例视频.webm](https://github.com/allrobot/KeyCastOW_chinese/assets/43485379/31a7c584-d820-4d9b-ad31-c4ccae7f52d9)
+ - [ShareX.exe](https://github.com/ShareX/ShareX)
+ - [SetDpi.exe](https://github.com/imniko/SetDPI)
+ - [ANK V2.0](https://autohotkey.com/)
 
 根据 [ShareX](https://getsharex.com/docs/command-line-arguments) 文档的ShareX [参数 ](https://github.com/ShareX/ShareX/blob/master/ShareX/Enums.cs) 
 
