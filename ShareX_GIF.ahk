@@ -55,10 +55,10 @@ GetCMDOutput(command){
 	KeyWait "LButton"  ; 等待鼠标左键被释放
 	MouseGetPos &mouseX, &mouseY  ; 获取鼠标当前的坐标
 	mouseX:=mouseX / DPI_ZOOM
-	mouseX:=Integer(mouseX)
+	mouseX:=Integer(mouseX)-1
 	; ExitApp 
 	mouseY:=mouseY / DPI_ZOOM
-	mouseY:=Integer(mouseY)
+	mouseY:=Integer(mouseY)-1
 	
 
 	
