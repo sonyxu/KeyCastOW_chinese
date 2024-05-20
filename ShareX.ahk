@@ -1,23 +1,17 @@
 ﻿#Requires AutoHotkey v2.0
+Persistent
 
 ; ShareX程序路径
 ShareXPath:="C:\Program Files\ShareX\ShareX.exe"
-if not FileExist(ShareXPath)
-{
-	; 当目标程序不存在，报告错误
-	MsgBox "ShareX执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行路径！"
-}
 ; KeyCastOW.exe程序路径
 KeyCastOWPath:="C:\Tools\Other_Tools\keystroke_visualizer_Tools\KeyCastOW\keycastow.exe"
-if not FileExist(KeyCastOWPath)
-{
-	MsgBox "KeyCastOW.exe执行路径不存在！请编辑ahk文件修改KeyCastOWPath为目标exe执行路径！"
-}
+
 ; 监视鼠标，坐标相对于整个屏幕
 CoordMode "Mouse", "Screen"
 
 ProcessCloseAll(PIDOrName)
 {
+	; 结束所有进程名的运行
 	While ProcessExist(PIDOrName)
 		ProcessClose PIDOrName
 }
@@ -30,13 +24,25 @@ GetCMDOutput(command){
 
 ^+PrintScreen:: ; 触发快捷键
 {
-
+	if not FileExist(KeyCastOWPath)
+	{
+		MsgBox "KeyCastOW.exe执行路径不存在！请编辑ahk文件修改KeyCastOWPath为目标exe执行路径！"
+		ExitApp
+	}
+	if not FileExist(ShareXPath)
+	{
+		; 当目标程序不存在，报告错误
+		MsgBox "ShareX执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行路径！"
+		ExitApp
+	}
+	
+	; 先结束键盘的程序，否则无法加载配置文件
 	ProcessCloseAll "keycastow.exe"
 	
 	
-
+	
 	; 执行 SetDPI.exe get 命令并获取输出
-    output := GetCMDOutput("C:\Tools\Other_Tools\SetDpi.exe get")
+	output := GetCMDOutput("C:\Tools\Other_Tools\SetDpi.exe get")
 	
 	; 获取字符串中的DPI缩放倍率
 	DPI_ZOOM:=StrReplace(output,"Current Resolution: ","")
@@ -44,10 +50,10 @@ GetCMDOutput(command){
 	
 	RunWait ShareXPath " -ScreenRecorderGIF"
 	
-    ; 等到鼠标按住再松开，获取最后松开时所在的坐标轴
+	; 等到鼠标按住再松开，获取最后松开时所在的坐标轴
 	KeyWait "LButton", "D" ; 等待鼠标左键按下
-    KeyWait "LButton"  ; 等待鼠标左键被释放
-    MouseGetPos &mouseX, &mouseY  ; 获取鼠标当前的坐标
+	KeyWait "LButton"  ; 等待鼠标左键被释放
+	MouseGetPos &mouseX, &mouseY  ; 获取鼠标当前的坐标
 	mouseX:=mouseX / DPI_ZOOM
 	mouseX:=Integer(mouseX)
 	; ExitApp 
@@ -105,20 +111,14 @@ GetCMDOutput(command){
 
 
 	; 执行键盘显示程序
-	RunWait KeyCastOWPath
-
-
+	Run KeyCastOWPath
+	; 防止意外结束键盘显示
+	sleep 700
 	; 当检测到截图所需的ffmpeg结束运行时关闭键盘显示
-
-	while 1{
-		ffmpeg_PID:=ProcessExist("ffmpeg.exe")
-		if not ffmpeg_PID
-		{
-			ProcessClose "keycastow.exe"
-			break
-		}
-		Send "ffmpeg.exe还存在"
-		Sleep 2000
+	ffmpeg_PID:=ProcessWaitClose("ffmpeg.exe")
+	if not ffmpeg_PID
+	{
+		ProcessCloseAll "keycastow.exe"
 	}
 	return
 }

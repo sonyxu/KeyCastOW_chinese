@@ -46,7 +46,7 @@ struct Key specialKeys[] = {
     {0x29, L"Select"},
     {0x2A, L"Print"},
     {0x2B, L"Execute"},
-    {0x2C, L"Snapshot"},
+    {0x2C, L"PrtSc截图键"},
     {0x2D, L"Insert"},
     {0x2E, L"Delete"},
     {0x2F, L"Help"},
