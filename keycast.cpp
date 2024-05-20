@@ -1,4 +1,4 @@
-// Copyright © 2014 Brook Hong. All Rights Reserved.
+﻿// Copyright © 2014 Brook Hong. All Rights Reserved.
 //
 
 // msbuild /p:platform=win32 /p:Configuration=Release
@@ -114,6 +114,7 @@ struct Displayed {
 };
 DWORD WINAPI replay(LPVOID ptr)
 {
+    // 函数说明：replay作用是重放录制的键盘操作，参数ptr为指向录制文件的文件名的指针
     replayStatus = 1;
     FILE *stream;
     WCHAR tmp[256];
@@ -138,10 +139,12 @@ DWORD WINAPI replay(LPVOID ptr)
 WCHAR logFile[MAX_PATH];
 FILE *logStream;
 void log(const std::stringstream & line) {
+    // 函数说明：log作用是记录键盘操作，参数line为stringstream对象，记录的内容为键盘操作
     fprintf(logStream,"%s",line.str().c_str());
 }
 #endif
 void stamp(HWND hwnd, LPCWSTR text) {
+    // 函数说明：stamp作用是显示时间戳，参数hwnd为窗口句柄，text为时间戳内容
     RECT rt;
     GetWindowRect(hwnd,&rt);
     HDC hdc = GetDC(hwnd);
@@ -185,6 +188,7 @@ void stamp(HWND hwnd, LPCWSTR text) {
     ReleaseDC(hwnd, hdc);
 }
 void updateLayeredWindow(HWND hwnd) {
+    // 函数说明：updateLayeredWindow作用是更新窗口的透明度，参数hwnd为窗口句柄
     POINT ptSrc = {0, 0};
     BLENDFUNCTION blendFunction;
     blendFunction.AlphaFormat = AC_SRC_ALPHA;
@@ -198,6 +202,7 @@ void updateLayeredWindow(HWND hwnd) {
     gCanvas->ReleaseHDC(hdcBuf);
 }
 void eraseLabel(int i) {
+    // 函数说明：eraseLabel作用是擦除指定标签，参数i为标签索引
     RectF &rt = keyLabels[i].rect;
     RectF rc(rt.X-labelSettings.borderSize, rt.Y-labelSettings.borderSize, rt.Width+2*labelSettings.borderSize+1, rt.Height+2*labelSettings.borderSize+1);
     gCanvas->SetClip(rc);
@@ -205,6 +210,8 @@ void eraseLabel(int i) {
     gCanvas->ResetClip();
 }
 void drawLabelFrame(Graphics* g, const Pen* pen, const Brush* brush, RectF &rc, REAL cornerSize) {
+    // 函数说明：drawLabelFrame作用是绘制标签的外框
+    // 参数g为Graphics对象，pen为画笔，brush为画刷，rc为标签的外框矩形，cornerSize为标签的圆角大小
     if(cornerSize > 0) {
         GraphicsPath path;
         REAL dx = rc.Width - cornerSize, dy = rc.Height - cornerSize;
@@ -223,6 +230,8 @@ void drawLabelFrame(Graphics* g, const Pen* pen, const Brush* brush, RectF &rc, 
 }
 #define BR(alpha, bgr) (alpha<<24|bgr>>16|(bgr&0x0000ff00)|(bgr&0x000000ff)<<16)
 void updateLabel(int i) {
+    // 函数说明：updateLabel作用是更新指定标签，参数i为标签索引
+    // 标签的更新包括擦除、绘制、更新时间、更新透明度
     eraseLabel(i);
 
     if(keyLabels[i].length > 0) {
@@ -252,6 +261,7 @@ void updateLabel(int i) {
 }
 
 void fadeLastLabel(BOOL whether) {
+    // 函数说明：fadeLastLabel作用是淡出最后一个标签，参数whether为TRUE时淡出，FALSE时不淡出
     keyLabels[labelCount-1].fade = whether;
 }
 
@@ -261,6 +271,8 @@ static int deferredTime;
 WCHAR deferredLabel[64];
 
 static void startFade() {
+    // 函数说明：startFade作用是启动淡出动画
+    // 标签淡出动画的实现是逐渐减少标签的透明度
     if(newStrokeCount > 0) {
         newStrokeCount -= SHOWTIMER_INTERVAL;
     }
@@ -268,6 +280,7 @@ static void startFade() {
     BOOL dirty = FALSE;
 
     if (wcslen(deferredLabel) > 0) {
+        // 更新延迟显示的标签
         // update deferred label if it exists
         if (deferredTime > 0) {
             deferredTime -= SHOWTIMER_INTERVAL;
@@ -294,6 +307,7 @@ static void startFade() {
             keyLabels[i].time = 0;
             if(keyLabels[i].length){
                 eraseLabel(i);
+                // 作用是keyLabels[i].length的减少，使得标签的长度逐渐缩短，以便显示完整的文本
                 // erase keyLabels[i].length times to avoid remaining shadow
                 keyLabels[i].length--;
                 dirty = TRUE;
@@ -306,6 +320,7 @@ static void startFade() {
 }
 
 bool outOfLine(LPCWSTR text) {
+    // 函数说明：outOfLine作用是判断文本是否超出画布边界，参数text为文本内容
     size_t newLen = wcslen(text);
     if(keyLabels[labelCount-1].text+keyLabels[labelCount-1].length+newLen >= textBufferEnd) {
         wcscpy_s(textBuffer, MAXCHARS, keyLabels[labelCount-1].text);
@@ -326,6 +341,7 @@ bool outOfLine(LPCWSTR text) {
  * behavior 2: replace last label with text
  */
 void showText(LPCWSTR text, int behavior = 0) {
+    // 函数说明：showText作用是显示文本，参数text为文本内容，behavior为显示行为
     SetWindowPos(hMainWnd,HWND_TOPMOST,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE|SWP_NOACTIVATE);
     size_t newLen = wcslen(text);
 
@@ -401,10 +417,10 @@ void updateCanvasSize(const POINT &pt) {
 
 #ifdef _DEBUG
     std::stringstream line;
-    line << "desktopRect: {left: " << desktopRect.left << ", top: " <<  desktopRect.top << ", right: " <<  desktopRect.right << ", bottom: " <<  desktopRect.bottom << "};\n";
-    line << "canvasSize: {" << canvasSize.cx << "," <<  canvasSize.cy << "};\n";
-    line << "canvasOrigin: {" << canvasOrigin.x << "," <<  canvasOrigin.y << "};\n";
-    line << "pt: {" << pt.x << "," <<  pt.y << "};\n";
+    line << "desktopRect: {left: " << desktopRect.left << ", top: " << desktopRect.top << ", right: " << desktopRect.right << ", bottom: " << desktopRect.bottom << "};\n";
+    line << "canvasSize: {" << canvasSize.cx << "," << canvasSize.cy << "};\n";
+    line << "canvasOrigin: {" << canvasOrigin.x << "," << canvasOrigin.y << "};\n";
+    line << "pt: {" << pt.x << "," << pt.y << "};\n";
     log(line);
 #endif
 }
@@ -617,18 +633,18 @@ void fixDeskOrigin() {
 }
 void loadSettings() {
     labelSettings.keyStrokeDelay = GetPrivateProfileInt(L"KeyCastOW", L"keyStrokeDelay", 500, iniFile);
-    labelSettings.lingerTime = GetPrivateProfileInt(L"KeyCastOW", L"lingerTime", 1200, iniFile);
-    labelSettings.fadeDuration = GetPrivateProfileInt(L"KeyCastOW", L"fadeDuration", 310, iniFile);
+    labelSettings.lingerTime = GetPrivateProfileInt(L"KeyCastOW", L"lingerTime", 1500, iniFile);
+    labelSettings.fadeDuration = GetPrivateProfileInt(L"KeyCastOW", L"fadeDuration", 500, iniFile);
     labelSettings.bgColor = GetPrivateProfileInt(L"KeyCastOW", L"bgColor", RGB(75, 75, 75), iniFile);
     labelSettings.textColor = GetPrivateProfileInt(L"KeyCastOW", L"textColor", RGB(255, 255, 255), iniFile);
     labelSettings.bgOpacity = GetPrivateProfileInt(L"KeyCastOW", L"bgOpacity", 200, iniFile);
-    labelSettings.textOpacity = GetPrivateProfileInt(L"KeyCastOW", L"textOpacity", 255, iniFile);
+    labelSettings.textOpacity = GetPrivateProfileInt(L"KeyCastOW", L"textOpacity", 230, iniFile);
     labelSettings.borderOpacity = GetPrivateProfileInt(L"KeyCastOW", L"borderOpacity", 200, iniFile);
     labelSettings.borderColor = GetPrivateProfileInt(L"KeyCastOW", L"borderColor", RGB(0, 128, 255), iniFile);
-    labelSettings.borderSize = GetPrivateProfileInt(L"KeyCastOW", L"borderSize", 8, iniFile);
-    labelSettings.cornerSize = GetPrivateProfileInt(L"KeyCastOW", L"cornerSize", 2, iniFile);
-    labelSpacing = GetPrivateProfileInt(L"KeyCastOW", L"labelSpacing", 1, iniFile);
-    maximumLines = GetPrivateProfileInt(L"KeyCastOW", L"maximumLines", 10, iniFile);
+    labelSettings.borderSize = GetPrivateProfileInt(L"KeyCastOW", L"borderSize", 4, iniFile);
+    labelSettings.cornerSize = GetPrivateProfileInt(L"KeyCastOW", L"cornerSize", 16, iniFile);
+    labelSpacing = GetPrivateProfileInt(L"KeyCastOW", L"labelSpacing", 4, iniFile);
+    maximumLines = GetPrivateProfileInt(L"KeyCastOW", L"maximumLines", 3, iniFile);
     if (maximumLines == 0) {
         maximumLines = 1;
     }
@@ -639,7 +655,7 @@ void loadSettings() {
     CopyMemory(&desktopRect, &mi.rcWork, sizeof(RECT));
     MoveWindow(hMainWnd, desktopRect.left, desktopRect.top, 1, 1, TRUE);
     fixDeskOrigin();
-    visibleShift = GetPrivateProfileInt(L"KeyCastOW", L"visibleShift", 0, iniFile);
+    visibleShift = GetPrivateProfileInt(L"KeyCastOW", L"visibleShift", 1, iniFile);
     visibleModifier = GetPrivateProfileInt(L"KeyCastOW", L"visibleModifier", 1, iniFile);
     mouseCapturing = GetPrivateProfileInt(L"KeyCastOW", L"mouseCapturing", 1, iniFile);
     mouseCapturingMod = GetPrivateProfileInt(L"KeyCastOW", L"mouseCapturingMod", 0, iniFile);
@@ -647,7 +663,7 @@ void loadSettings() {
     mergeMouseActions = GetPrivateProfileInt(L"KeyCastOW", L"mergeMouseActions", 1, iniFile);
     alignment = GetPrivateProfileInt(L"KeyCastOW", L"alignment", 1, iniFile);
     onlyCommandKeys = GetPrivateProfileInt(L"KeyCastOW", L"onlyCommandKeys", 0, iniFile);
-    draggableLabel = GetPrivateProfileInt(L"KeyCastOW", L"draggableLabel", 0, iniFile);
+    draggableLabel = GetPrivateProfileInt(L"KeyCastOW", L"draggableLabel", 1, iniFile);
     if (draggableLabel) {
         SetWindowLong(hMainWnd, GWL_EXSTYLE, GetWindowLong(hMainWnd, GWL_EXSTYLE) & ~WS_EX_TRANSPARENT);
     } else {
@@ -655,8 +671,8 @@ void loadSettings() {
     }
     tcModifiers = GetPrivateProfileInt(L"KeyCastOW", L"tcModifiers", MOD_ALT, iniFile);
     tcKey = GetPrivateProfileInt(L"KeyCastOW", L"tcKey", 0x42, iniFile);
-    GetPrivateProfileString(L"KeyCastOW", L"branding", L"Hi there, press any key to try, double click to configure.", branding, BRANDINGMAX, iniFile);
-    GetPrivateProfileString(L"KeyCastOW", L"comboChars", L"<->", comboChars, 4, iniFile);
+    GetPrivateProfileString(L"KeyCastOW", L"branding", L"短语会一直显示，可拖拽，双击此处弹出设置，可删短语取消显示", branding, BRANDINGMAX, iniFile);
+    GetPrivateProfileString(L"KeyCastOW", L"comboChars", L"<+>", comboChars, 4, iniFile);
     memset(&labelSettings.font, 0, sizeof(labelSettings.font));
     labelSettings.font.lfCharSet = DEFAULT_CHARSET;
     labelSettings.font.lfHeight = -37;
@@ -806,10 +822,10 @@ BOOL CALLBACK SettingsWndProc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPar
                         desktopRect.right - desktopRect.left - settingsDlgRect.right + settingsDlgRect.left,
                         desktopRect.bottom - desktopRect.top - settingsDlgRect.bottom + settingsDlgRect.top, 0, 0, SWP_NOSIZE);
                 GetWindowRect(hwndDlg, &settingsDlgRect);
-                CreateToolTip(hwndDlg, IDC_COMBSCHEME, L"[+] to display combination keys like [Alt + Tab].");
+                CreateToolTip(hwndDlg, IDC_COMBSCHEME, L"[+] 显示[Alt + Tab]等组合键.");
                 HWND hCtrl = GetDlgItem(hwndDlg, IDC_ALIGNMENT);
-                ComboBox_InsertString(hCtrl, 0, L"Left");
-                ComboBox_InsertString(hCtrl, 1, L"Right");
+                ComboBox_InsertString(hCtrl, 0, L"左");
+                ComboBox_InsertString(hCtrl, 1, L"右");
             }
             return TRUE;
         case WM_NOTIFY:
@@ -926,7 +942,7 @@ BOOL CALLBACK SettingsWndProc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lPar
                         tcKey = VkKeyScanEx(tmp[0], GetKeyboardLayout(0));
                         UnregisterHotKey(NULL, 1);
                         if (!RegisterHotKey( NULL, 1, tcModifiers | MOD_NOREPEAT, tcKey)) {
-                            MessageBox(NULL, L"Unable to register hotkey, you probably need go to settings to redefine your hotkey for toggle capturing.", L"Warning", MB_OK|MB_ICONWARNING);
+                            MessageBox(NULL, _T("无法注册热键，您可能需要到设置中重新定义切换捕获的热键"), L"Warning", MB_OK|MB_ICONWARNING);
                         }
                     }
                     prepareLabels();
@@ -995,16 +1011,16 @@ LRESULT CALLBACK WindowFunc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 nid.uFlags              = NIF_ICON | NIF_MESSAGE | NIF_TIP;
                 nid.uCallbackMessage    = WM_TRAYMSG;
                 nid.hIcon = LoadIcon( hInstance, MAKEINTRESOURCE(IDI_ICON1));
-                lstrcpy( nid.szTip, L"KeyCast On Windows by brook hong" );
+                lstrcpy( nid.szTip, L"Win7、win10的KeyCast来源于 brook hong，汉化 By allrobot" );
                 Shell_NotifyIcon( NIM_ADD, &nid );
 
                 hPopMenu = CreatePopupMenu();
-                AppendMenu( hPopMenu, MF_STRING, MENU_CONFIG,  L"&Settings..." );
-                AppendMenu( hPopMenu, MF_STRING, MENU_RESTORE,  L"&Restore default settings" );
+                AppendMenu( hPopMenu, MF_STRING, MENU_CONFIG,  L"&设置..." );
+                AppendMenu( hPopMenu, MF_STRING, MENU_RESTORE,  L"&恢复默认设置" );
 #ifdef _DEBUG
-                AppendMenu( hPopMenu, MF_STRING, MENU_REPLAY,  L"Re&play" );
+                AppendMenu( hPopMenu, MF_STRING, MENU_REPLAY,  L"&重播" );
 #endif
-                AppendMenu( hPopMenu, MF_STRING, MENU_EXIT,    L"E&xit" );
+                AppendMenu( hPopMenu, MF_STRING, MENU_EXIT,    L"&退出" );
                 SetMenuDefaultItem( hPopMenu, MENU_CONFIG, FALSE );
             }
             break;
@@ -1049,7 +1065,7 @@ LRESULT CALLBACK WindowFunc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                         {
                             if(replayStatus == 1) {
                                 replayStatus = 2;
-                                ModifyMenu( hPopMenu, MENU_REPLAY, MF_STRING, MENU_REPLAY, L"Re&play");
+                                ModifyMenu( hPopMenu, MENU_REPLAY, MF_STRING, MENU_REPLAY, L"&重播");
                             } else {
                                 OPENFILENAME ofn;
                                 ZeroMemory(&ofn, sizeof(OPENFILENAME));
@@ -1062,7 +1078,7 @@ LRESULT CALLBACK WindowFunc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                                 if(GetOpenFileName(&ofn)) {
                                     unsigned long id = 1;
                                     CreateThread(NULL,0,replay,recordFN,0,&id);
-                                    ModifyMenu( hPopMenu, MENU_REPLAY, MF_STRING, MENU_REPLAY, L"Stop re&play");
+                                    ModifyMenu( hPopMenu, MENU_REPLAY, MF_STRING, MENU_REPLAY, L"&停止播放");
                                 }
                             }
                         }
@@ -1155,17 +1171,18 @@ void CreateMiniDump( LPEXCEPTION_POINTERS lpExceptionInfo) {
         BOOL retv = MiniDumpWriteDump( GetCurrentProcess(), GetCurrentProcessId(),
             hFile, mdt, ( lpExceptionInfo != 0 ) ? &mdei : 0, 0, 0);
 
-        if ( !retv ) {
-            printf( ("MiniDumpWriteDump failed. Error: %u \n"), GetLastError() );
-        } else {
-            printf( ("Minidump created.\n") );
+        if (!retv) {
+            printf(("MiniDumpWriteDump 配置文件写入失败. Error: %u \n"), GetLastError());
+        }
+        else {
+            printf(("Minidump 配置文件已创建.\n"));
         }
 
         // Close the file
         CloseHandle( hFile );
 
     } else {
-        printf( ("CreateFile failed. Error: %u \n"), GetLastError() );
+        printf( ("创建文件失败. Error: %u \n"), GetLastError() );
     }
 }
 
@@ -1208,7 +1225,7 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst,
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
     if(!MyRegisterClassEx(hThisInst, szWinName, WindowFunc)) {
-        MessageBox(NULL, L"Could not register window class", L"Error", MB_OK);
+        MessageBox(NULL, L"未能注册窗口类", L"Error", MB_OK);
         return 0;
     }
 
@@ -1225,7 +1242,7 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst,
             NULL
             );
     if( !hMainWnd)    {
-        MessageBox(NULL, L"Could not create window", L"Error", MB_OK);
+        MessageBox(NULL, L"未能创建窗口", L"Error", MB_OK);
         return 0;
     }
 
@@ -1240,7 +1257,7 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst,
             NULL, NULL, hThisInst, NULL);
 
     if (!RegisterHotKey( NULL, 1, tcModifiers | MOD_NOREPEAT, tcKey)) {
-        MessageBox(NULL, L"Unable to register hotkey, you probably need go to settings to redefine your hotkey for toggle capturing.", L"Warning", MB_OK|MB_ICONWARNING);
+        MessageBox(NULL, L"无法注册热键，您可能需要到设置中重新定义切换捕获的热键", L"警告窗口", MB_OK|MB_ICONWARNING);
     }
     UpdateWindow(hMainWnd);
 
@@ -1265,13 +1282,13 @@ int WINAPI WinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst,
     while( GetMessage(&msg, NULL, 0, 0) )    {
         if (msg.message == WM_HOTKEY) {
             if(kbdhook) {
-                showText(L"\u263b - KeyCastOW OFF", 1);
+                showText(L"\u263b - KeyCastOW 已关闭", 1);
                 UnhookWindowsHookEx(kbdhook);
                 kbdhook = NULL;
                 UnhookWindowsHookEx(moshook);
                 moshook = NULL;
             } else {
-                showText(L"\u263b - KeyCastOW ON", 1);
+                showText(L"\u263b - KeyCastOW 已开启", 1);
                 kbdhook = SetWindowsHookEx(WH_KEYBOARD_LL, LLKeyboardProc, hInstance, NULL);
                 moshook = SetWindowsHookEx(WH_MOUSE_LL, LLMouseProc, hThisInst, 0);
             }

@@ -1,15 +1,13 @@
 # KeyCastOW
-keystroke visualizer for Windows, lets you easily display your keystrokes while recording screencasts.
+用于Windows的按键可视化工具，让您在录制屏幕视频时轻松显示您的按键。
 
-* small footprint (one 100kb executable file)
-* green and portable, only depends on windows system dlls
-* prenty of settings for keystroke display
-* hotkey to turn on/off
+感谢Brook Hong作者开发。
+
+本软件结合 [ShareX](https://github.com/ShareX/ShareX) 和 [ANK](https://autohotkey.com/) 使用，每次截图能节约一些时间
+
+下载ank安装，ahk文件放置于`C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp`
 
 
-## build
-
-  msbuild /p:platform=win32 /p:Configuration=Release
 
 ## License
 
