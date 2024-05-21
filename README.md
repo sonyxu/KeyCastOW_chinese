@@ -17,6 +17,8 @@
  - [SetDpi.exe](https://github.com/imniko/SetDPI)
  - [ANK V2.0](https://autohotkey.com/)
  
+ AHK文件仅支持<kbd>shift</kbd>+<kbd>alt</kbd>+<kbd>PrtSc截屏键</kbd>和<kbd>shift</kbd>+<kbd>PrtSc截屏键</kbd>弹出KeyCastOW程序，有需要的请参阅AHK文档自行添加、修改
+ 
 ### AHK思路
 
 根据 [ShareX](https://getsharex.com/docs/command-line-arguments) 文档的ShareX [参数 ](https://github.com/ShareX/ShareX/blob/master/ShareX/Enums.cs) 

@@ -8,6 +8,27 @@ KeyCastOWPath:="C:\Tools\Other_Tools\keystroke_visualizer_Tools\KeyCastOW\keycas
 ; SetDpi工具
 SetDPIPath:="C:\Tools\Other_Tools\SetDpi.exe"
 
+; bool变量，用于再次按键时停止运行
+stop_bool:=False
+
+if not FileExist(KeyCastOWPath)
+{
+	MsgBox "KeyCastOW.exe执行路径不存在！请编辑ahk文件修改KeyCastOWPath为目标ex执行路径！"
+	ExitApp
+}
+if not FileExist(ShareXPath)
+{
+	; 当目标程序不存在，报告错误
+	MsgBox "ShareX.exe执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行径！"
+	ExitApp
+}
+if not FileExist(SetDPIPath)
+{
+	; 当目标程序不存在，报告错误
+	MsgBox "SetDpi.exe执行路径不存在！请编辑ahk文件修改SetDPIPath为目标exe执行径！"
+	ExitApp
+}
+
 ; 监视鼠标，坐标相对于整个屏幕
 CoordMode "Mouse", "Screen"
 
@@ -24,27 +45,10 @@ GetCMDOutput(command){
 	return exec.StdOut.ReadAll()
 }
 
-^+PrintScreen:: ; 触发快捷键
+; 执行ShareX和KeyCastOW程序
+RunVisualizationKeys(command)
 {
-	if not FileExist(KeyCastOWPath)
-	{
-		MsgBox "KeyCastOW.exe执行路径不存在！请编辑ahk文件修改KeyCastOWPath为目标exe执行路径！"
-		ExitApp
-	}
-	if not FileExist(ShareXPath)
-	{
-		; 当目标程序不存在，报告错误
-		MsgBox "ShareX.exe执行路径不存在！请编辑ahk文件修改ShareXPath为目标exe执行路径！"
-		ExitApp
-	}
-	if not FileExist(SetDPIPath)
-	{
-		; 当目标程序不存在，报告错误
-		MsgBox "SetDpi.exe执行路径不存在！请编辑ahk文件修改SetDPIPath为目标exe执行路径！"
-		ExitApp
-	}
-	
-	; 先结束键盘的程序，否则无法加载配置文件
+    ; 先结束键盘的程序，否则无法加载配置文件
 	ProcessCloseAll "keycastow.exe"
 	
 	
@@ -56,12 +60,16 @@ GetCMDOutput(command){
 	DPI_ZOOM:=StrReplace(output,"Current Resolution: ","")
 	DPI_ZOOM:=Integer(DPI_ZOOM) / 100
 	
-	RunWait ShareXPath " -ScreenRecorderGIF"
+    ; 执行ShareX程序
+	RunWait ShareXPath command
+
+    ; 等待再次按下同个快捷键
+    Global stop_bool:=True
 	
 	; 等到鼠标按住再松开，获取最后松开时所在的坐标轴
-	KeyWait "LButton", "D" ; 等待鼠标左键按下
-	KeyWait "LButton"  ; 等待鼠标左键被释放
-	MouseGetPos &mouseX, &mouseY  ; 获取鼠标当前的坐标
+	KeyWait "LButton", "D" 
+	KeyWait "LButton"  
+	MouseGetPos &mouseX, &mouseY  
 	mouseX:=mouseX / DPI_ZOOM
 	mouseX:=Integer(mouseX)-1
 	; ExitApp 
@@ -120,13 +128,53 @@ GetCMDOutput(command){
 
 	; 执行键盘显示程序
 	Run KeyCastOWPath
-	; 防止意外结束键盘显示
-	sleep 700
+	
+	
+	
+	; 等待至截屏程序所需的ffmpeg开始运行
+	while not ProcessExist("ffmpeg.exe")
+    {
+        Sleep 100
+    }        
 	; 当检测到截图所需的ffmpeg结束运行时关闭键盘显示
 	ffmpeg_PID:=ProcessWaitClose("ffmpeg.exe")
 	if not ffmpeg_PID
 	{
 		ProcessCloseAll "keycastow.exe"
+        Global stop_bool:=False
 	}
+    return
+}
+
+; 触发快捷键shift+alt+PrtSc键
+^+PrintScreen:: 
+{
+    RunVisualizationKeys " -ScreenRecorderGIF"
 	return
 }
+
+; 触发快捷键shift+PrtSc键
++PrintScreen:: 
+{
+    RunVisualizationKeys " -ScreenRecorder"
+    return
+}
+
+; 如果再次按下同一个快捷键，则停止运行
+#HotIf stop_bool
+^+PrintScreen:: 
+{
+    RunWait ShareXPath " -ScreenRecorderGIF"
+    Global stop_bool:=False
+    return
+}
+#HotIf
+
+#HotIf stop_bool
++PrintScreen:: 
+{
+    RunWait ShareXPath " -ScreenRecorder"
+    Global stop_bool:=False
+    return
+}
+#HotIf
