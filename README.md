@@ -38,6 +38,8 @@
 
 如果检测到ffmpeg.exe进程已退出，说明截屏已完毕（ShareX截mp4或gif调用该进程），那么KeyCastOW程序也将退出
 
+顺便调用`TrayIcon_Clean()`清理托盘图标
+
 >没琢磨怎么隐藏命令行，有人做的比我更好可以Pull提交分支
 
 
