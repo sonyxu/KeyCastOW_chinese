@@ -1,5 +1,13 @@
 ﻿#Requires AutoHotkey v2.0
 Persistent
+
+; ShareX程序路径
+ShareXPath:="C:\Program Files\ShareX\ShareX.exe"
+; KeyCastOW.exe程序路径
+KeyCastOWPath:="C:\Tools\Other_Tools\keystroke_visualizer_Tools\KeyCastOW\keycastow.exe"
+; SetDpi工具
+SetDPIPath:="C:\Tools\Other_Tools\SetDpi.exe"
+
 ;链接来源于：https://www.autohotkey.com/boards/viewtopic.php?f=27&t=130098&p=573646#p573646
 ;原作者：
 
@@ -289,12 +297,6 @@ TrayIcon_Clean(bVerbose := false)
   }
 }
 
-; ShareX程序路径
-ShareXPath:="C:\Program Files\ShareX\ShareX.exe"
-; KeyCastOW.exe程序路径
-KeyCastOWPath:="C:\Tools\Other_Tools\keystroke_visualizer_Tools\KeyCastOW\keycastow.exe"
-; SetDpi工具
-SetDPIPath:="C:\Tools\Other_Tools\SetDpi.exe"
 
 ; bool变量，用于再次按键时停止运行
 stop_bool:=False
