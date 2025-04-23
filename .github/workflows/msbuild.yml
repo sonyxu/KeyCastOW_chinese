@@ -54,5 +54,5 @@ jobs:
       with:
         name: binaries-${{ matrix.platform }}
         path: |
-          ${{ env.SOLUTION_FILE_PATH }}/bin/${{ env.BUILD_CONFIGURATION }}/keycastow.exe
+          ${{ env.SOLUTION_FILE_PATH }}/keycastow/${{ env.BUILD_CONFIGURATION }}/keycastow.exe
           
