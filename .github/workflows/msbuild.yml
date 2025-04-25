@@ -38,9 +38,9 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+    # - name: Restore NuGet packages
+    #   working-directory: ${{env.GITHUB_WORKSPACE}}
+    #   run: nuget restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -50,7 +50,8 @@ jobs:
         msbuild ${{env.SOLUTION_FILE_PATH}} `
           /m `
           /p:Configuration=${{env.BUILD_CONFIGURATION}} `
-          /p:Platform=${{ matrix.platform }}
+          /p:Platform=${{ matrix.platform }} `
+          /p:AssemblyName=keycastow_${{ matrix.platform }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
