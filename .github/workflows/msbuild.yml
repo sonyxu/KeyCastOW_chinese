@@ -79,5 +79,5 @@ jobs:
           - Platform: x86 & x64
           - Build Config: ${{ env.BUILD_CONFIGURATION }}
         files: |
-          keycastow-x86/*.exe
-          keycastow-x64/*.exe
+          artifacts/keycastow-x86/*.exe
+          artifacts/keycastow-x64/*.exe
