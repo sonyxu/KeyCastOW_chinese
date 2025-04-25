@@ -51,6 +51,7 @@ jobs:
           /m `
           /p:Configuration=${{env.BUILD_CONFIGURATION}} `
           /p:Platform=${{ matrix.platform }} `
+          /p:PreferredToolArchitecture=${{ matrix.platform }} `
           /p:AssemblyName=keycastow_${{ matrix.platform }}
 
     - name: Upload Artifacts
