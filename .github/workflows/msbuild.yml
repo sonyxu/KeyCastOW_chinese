@@ -58,7 +58,7 @@ jobs:
       with:
         name: keycastow-${{ matrix.platform }}
         path: |
-          ${{ env.SOLUTION_FILE_PATH }}/${{ env.BUILD_CONFIGURATION }}/keycastow.exe
+          ${{ env.SOLUTION_FILE_PATH }}/${{ env.BUILD_CONFIGURATION }}/keycastow_${{ matrix.platform }}.exe
           
   release:
     name: Create Release
