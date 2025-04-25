@@ -1,7 +1,8 @@
 ## KeyCastOW
 用于Windows的按键可视化工具，让您在录制屏幕视频时轻松显示您的按键。
 
-感谢Brook Hong作者开发。
+感谢Brook Hong作者开发、allrobot的汉化已经AHK脚本开发。本Fork仅做了release编译，解决大部分电脑不会安装dev包的问题。
+
 
 ## AHK示例 
 
